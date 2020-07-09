@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using TestAppCore.Data;
 
 namespace TestAppCore
 {
@@ -13,6 +14,7 @@ namespace TestAppCore
     {
         public static void Main(string[] args)
         {
+            DataSource.InitBase();
             CreateHostBuilder(args).Build().Run();
         }
 

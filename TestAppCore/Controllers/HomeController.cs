@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using TestAppCore.Data;
 using TestAppCore.Models;
 
 namespace TestAppCore.Controllers
@@ -20,13 +21,13 @@ namespace TestAppCore.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.Brands = DataSource.GetBrands();
+            ViewBag.BodyTypes = DataSource.GetBodyTypes();
+
+
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

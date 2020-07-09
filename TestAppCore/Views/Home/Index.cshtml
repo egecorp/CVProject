@@ -1,76 +1,136 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@*Не используем Layout, т.к. таблица одна и нет смысла усложнять код*@
+@{
+    Layout = null;
 }
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Тестовое задание - Список моделей автомобилей</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div class="table-responsive-xl">
+                <table class="table">
 
-    <div class="table-responsive-xl">
-        <table class="table">
-            
-            <thead>
-                <tr>
-                    <th scope="col">Модель</th>
-                    <th scope="col">Бренд</th>
-                    <th scope="col">Тип кузова</th>
-                    <th scope="col">Количество мест</th>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tfoot>
-                <tr>
-                    <th>
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Назад</a>
-                                </li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Далее</a>
-                                </li>
-                            </ul>
-                        </nav>
+                    <thead>
+                        <tr>
+                            <th scope="col">Модель</th>
+                            <th scope="col">Бренд</th>
+                            <th scope="col">Тип кузова</th>
+                            <th scope="col">Количество мест</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination justify-content-center" id="Cars_Table_Nav">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" onclick="Nav_Prev()" href="#" tabindex="-1" aria-disabled="true">Назад</a>
+                                        </li>
+                                        @*<li class="page-item"><a class="page-link" href="#">1</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">3</a></li>*@
+                                        <li class="page-item">
+                                            <a class="page-link" onclick="Nav_Next()" href="#" aria-disabled="true">Далее</a>
+                                        </li>
+                                    </ul>
+                                </nav>
 
-                        <button class="btn btn-primary" type="submit">Добавить</button>
+                                <button class="btn btn-primary" type="submit">Добавить</button>
 
-                    </th>
-                </tr>
-            </tfoot>
-            <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@@mdo</td>
-                    <td>Otto</td>
-                    <td>@@mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@@fat</td>
-                    <td>Otto</td>
-                    <td>@@mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td colspan="2">Larry the Bird</td>
-                    <td>@@twitter</td>
-                    <td>Otto</td>
-                    <td>@@mdo</td>
-                </tr>
-            </tbody>
+                            </th>
+                        </tr>
+                    </tfoot>
+                    <tbody id="Cars_Table_Body">
+                        <tr>
+                            <th colspan="6" scope="row">Пожалуйста, подождите...</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        </table>
+        </main>
     </div>
 
-    <div class="modal-body">
-        <h5>Редактирование модели автомобиля</h5>
-        <p>This <a href="#" role="button" class="btn btn-secondary popover-test" title="Popover title" data-content="Popover body content is set in this attribute.">button</a> triggers a popover on click.</p>
-        <hr>
-        <h5>Tooltips in a modal</h5>
-        <p><a href="#" class="tooltip-test" title="Tooltip">This link</a> and <a href="#" class="tooltip-test" title="Tooltip">that link</a> have tooltips on hover.</p>
+    <div class="modal" tabindex="-1" role="dialog" id="Car_Card_Modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактирование модели автомобиля</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="Car_Card_CreateStamp">Дата создания</label>
+                        <input type="datetime-local" readonly="readonly" class="form-control" id="Car_Card_CreateStamp" >
+                    </div>
+                    <div class="form-group">
+                        <label for="Car_Card_Id">Идентификатор</label>
+                        <input type="text" readonly="readonly" class="form-control" id="Car_Card_Id" placeholder="Идентификатор">
+                    </div>
+                    <div class="form-group">
+                        <label for="Car_Card_Name">Наименование модели</label>
+                        <input type="text" class="form-control" id="Car_Card_Name" placeholder="Наименование модели">
+                    </div>
+                    <div class="form-group">
+                        <label for="Car_Card_BrandId">Бренд</label>
+                        <select class="custom-select" id="Car_Card_BrandId">
+                            @foreach (Brand br in ViewBag.Brands)
+                            {
+                            <option value="@Html.Raw(br.Id)">@Html.Raw(br.Name)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="Car_Card_BodyTypeId">Тип кузова</label>
+                        <select class="custom-select" id="Car_Card_BodyTypeId">
+                            @foreach (BodyType bt in ViewBag.BodyTypes)
+                            {
+                                <option value="@Html.Raw(bt.Id)">@Html.Raw(bt.Name)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="Car_Card_SeatsCount">Количество сидений</label>
+                        <input type="number" class="form-control" id="Car_Card_SeatsCount" placeholder="Количество сидений">
+                    </div>
+                    <div class="form-group">
+                        <label for="Car_Card_Url">Сайт</label>
+                        <input type="url" class="form-control" id="Car_Card_Url" placeholder="Сайт">
+                    </div>
+                    <div class="form-group">
+                        <label for="Car_Card_CarImageId">Изображение</label>
+                        <input type="text" class="form-control" id="Car_Card_CarImageId" placeholder="Изображение">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="Car_Card_Save_Button">Сохранить</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/car.js" asp-append-version="true"></script>
+    <script src="~/js/server.js" asp-append-version="true"></script>
+    <script src="~/js/main.js" asp-append-version="true"></script>
+</body>
+</html>
+
+
+
