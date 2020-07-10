@@ -104,6 +104,66 @@ namespace TestAppCore.Controllers
             return JsonConvert.SerializeObject(answer);
         }
 
+
+
+        public string CrateCar([FromBody] Car value)
+        {
+            int carId = -1;
+
+            if (!int.TryParse(Id, out carId))
+            {
+                return GetErrorAnswer("Укажите корректный идентификатор модели автомобиля");
+            }
+
+            Car oneCar = DataSource.GetCar(carId);
+            if (oneCar == null)
+            {
+                return GetErrorAnswer("Не удалось найти модель автомобиля");
+            }
+
+            DataSource.DeleteCar(oneCar);
+
+            int PagesCount = DataSource.GetCarsPagesCount();
+
+            RequestResult answer = new RequestResult()
+            {
+                PageCount = PagesCount
+            };
+
+            return JsonConvert.SerializeObject(answer);
+        }
+
+
+
+        public string DeleteCar([FromBody] Car value)
+        {
+            int carId = -1;
+
+            if (!int.TryParse(Id, out carId))
+            {
+                return GetErrorAnswer("Укажите корректный идентификатор модели автомобиля");
+            }
+
+            Car oneCar = DataSource.GetCar(carId);
+            if (oneCar == null)
+            {
+                return GetErrorAnswer("Не удалось найти модель автомобиля");
+            }
+
+            DataSource.DeleteCar(oneCar);
+
+            int PagesCount = DataSource.GetCarsPagesCount();
+
+            RequestResult answer = new RequestResult()
+            {
+                PageCount = PagesCount
+            };
+
+            return JsonConvert.SerializeObject(answer);
+        }
+
+
+
         // Перенести
         public string GetErrorAnswer(string txt)
         {

@@ -2,6 +2,10 @@
 
 $(function () {
   me.server = new Server();
+  me.currentCar = null;
+  me.CurrentPage = 0;
+  me.PageCount = 0;
+
   InitEvents();
 
   GetPage(0);
@@ -15,11 +19,36 @@ function InitEvents()
   $("Main_Add_Button").click(function () {
     console.log("Нажата кнопка Добавить");
   });
+
+  $("#Cars_Table_Add_Button").click(function () {
+
+    me.currentCar = new Car();
+    me.currentCar.ViewToCard();
+    $("#Car_Card_Modal").modal('show');
+   
+  });
+
+  $("#Car_Card_Save_Button").click(function ()
+  {
+    if (!me.currentCar) return;
+    var postData = me.currentCar.SetFromCard();
+
+    console.log(postData);
+    if (me.currentCar.Id < 0)
+    {
+      console.log('Create');
+    }
+    else
+    {
+      console.log('Save');
+    }
+    
+
+  });
 };
 
 
-var CurrentPage = 0;
-var PageCount = 0;
+
 
 function GetPage(PageNumber)
 {
@@ -27,8 +56,8 @@ function GetPage(PageNumber)
 
     var carList = [];
 
-    CurrentPage = data.CurrentPage;
-    PageCount = data.PageCount;
+    me.CurrentPage = data.CurrentPage;
+    me.PageCount = data.PageCount;
 
     for (var i in data.CarList)
     {
@@ -65,18 +94,18 @@ function LoadDataToTable(carList)
 function LoadDataToNav()
 {
   var html = '' +
-    '<li class="page-item ' + ((CurrentPage <= 0) ? 'disabled' : '') + ' ">' +
-    ' <a class="page-link" ' + ((CurrentPage <= 0) ? '' : 'onclick="Nav_Prev()"') + ' href="#" tabindex="-1" aria-disabled="' + ((CurrentPage <= 0) ? 'true' : 'false') + '">Назад</a>' +
+    '<li class="page-item ' + ((me.CurrentPage <= 0) ? 'disabled' : '') + ' ">' +
+    ' <a class="page-link" ' + ((me.CurrentPage <= 0) ? '' : 'onclick="Nav_Prev()"') + ' href="#" tabindex="-1" aria-disabled="' + ((me.CurrentPage <= 0) ? 'true' : 'false') + '">Назад</a>' +
     '</li>' +
-    '     <li class="page-item ' + ((CurrentPage == 0) ? 'active' : '') + ' "><a class="page-link" href="#" onclick="Nav_Open(0)">1</a></li>';
+    '     <li class="page-item ' + ((me.CurrentPage == 0) ? 'active' : '') + ' "><a class="page-link" href="#" onclick="Nav_Open(0)">1</a></li>';
 
-    for (var i = 1; i < PageCount; i++)
+  for (var i = 1; i < me.PageCount; i++)
     {
-      html += '     <li class="page-item ' + ((CurrentPage == i) ? 'active' : '') + '"><a class="page-link" href="#" onclick="Nav_Open(' + i +')">' + (i + 1) + '</a></li>';
+    html += '     <li class="page-item ' + ((me.CurrentPage == i) ? 'active' : '') + '"><a class="page-link" href="#" onclick="Nav_Open(' + i +')">' + (i + 1) + '</a></li>';
     }
 
-  html +=   '<li class="page-item ' + ((CurrentPage >= PageCount - 1) ? 'disabled' : '') + '">' +
-    ' <a class="page-link" ' + ((CurrentPage >= PageCount -1) ? '' : 'onclick="Nav_Next()"') + '  href="#" aria-disabled="' + ((CurrentPage >= PageCount - 1) ? 'true' : 'false') + '">Далее</a>' +
+  html += '<li class="page-item ' + ((me.CurrentPage >= me.PageCount - 1) ? 'disabled' : '') + '">' +
+    ' <a class="page-link" ' + ((me.CurrentPage >= me.PageCount - 1) ? '' : 'onclick="Nav_Next()"') + '  href="#" aria-disabled="' + ((me.CurrentPage >= me.PageCount - 1) ? 'true' : 'false') + '">Далее</a>' +
             '</li>';
   $("#Cars_Table_Nav").html(html);
 }
@@ -91,9 +120,9 @@ function Car_Edit_Function(Id)
       return;
     }
 
-    var oneCar = new Car();
-    oneCar.LoadFromServer(data.OneCar);
-    oneCar.ViewToCard();
+    me.currentCar = new Car();
+    me.currentCar.LoadFromServer(data.OneCar);
+    me.currentCar.ViewToCard();
     $("#Car_Card_Modal").modal('show');
   }
   me.server.GetOneCar(Id, ViewCard);  
@@ -108,9 +137,9 @@ function Car_Delete_Function(Id)
   {
     function ReViewTable(data) {
 
-      PageCount = data.PageCount;
-      if ((CurrentPage >= PageCount) && (CurrentPage > 0)) CurrentPage--;
-      Nav_Open(CurrentPage);
+      me.PageCount = data.PageCount;
+      if ((me.CurrentPage >= me.PageCount) && (me.CurrentPage > 0)) me.CurrentPage--;
+      Nav_Open(me.CurrentPage);
     }
     me.server.DeleteOneCar(Id, ReViewTable);  
 
@@ -127,13 +156,13 @@ function Nav_Open(PageNumber)
 
 function Nav_Next()
 {
-  if (CurrentPage >= PageCount) return;
-  GetPage(CurrentPage + 1);
+  if (me.CurrentPage >= me.PageCount) return;
+  GetPage(me.CurrentPage + 1);
 }
 
 
 function Nav_Prev()
 {
-  if (CurrentPage <= 0) return;
-  GetPage(CurrentPage - 1);
+  if (me.CurrentPage <= 0) return;
+  GetPage(me.CurrentPage - 1);
 }

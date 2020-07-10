@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using TestAppCore.Data;
+using System.Text.RegularExpressions;
 
 namespace TestAppCore.Models
 {
@@ -83,5 +84,33 @@ namespace TestAppCore.Models
         public byte CarImageId { set; get; }
 
 
+
+        public string PutValidate()
+        {
+            this.Name = (this.Name ?? "").Trim();
+            if (this.Name == "") return "Необходимо указать корректное имя";
+            // Заменить
+            if (this.Name.Length > 1000) return "Имя не должно быть длиннее 1000 символов";
+
+            this.Url = (this.Url ?? "").Trim();
+            if (this.Url == "")
+            {
+                this.Url = null;
+            }
+            else
+            {
+                Regex urlCheck = new Regex(@"([0 - 9a - z][-\w]*[0 - 9a - z]*\.*)+\.ru$");
+                if (!urlCheck.IsMatch(this.Url))
+                {
+                    return "Некорректный адрес сайта";
+                }
+            }
+            // Заменить
+            if (this.Name.Length > 1000) return "Имя не должно быть длиннее 1000 символов";
+
+            this.CreateStamp = DateTime.Now;
+
+            return null;
+        }
     }
 }

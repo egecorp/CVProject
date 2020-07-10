@@ -30,7 +30,14 @@ var Car = function ()
   // Загрузим данные в форму
   this.ViewToCard = function ()
   {
-    $("#Car_Card_Id").val(this.Id);
+    if (this.Id && (this.Id > 0))
+    {
+      $("#Car_Card_Id").val(this.Id);
+    }
+    else
+    {
+      $("#Car_Card_Id").val('Новая модель');
+    }
     $("#Car_Card_BrandId").val(this.BrandId);
     $("#Car_Card_Name").val(this.Name);
     $("#Car_Card_CreateStamp").val(this.CreateStamp);
