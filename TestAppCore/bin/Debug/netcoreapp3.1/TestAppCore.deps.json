@@ -27,6 +27,7 @@
           "EntityFramework": "6.4.4",
           "Newtonsoft.Json": "12.0.3",
           "PagedList.Mvc": "4.5.0",
+          "System.Drawing.Common": "4.7.0",
           "Microsoft.AspNetCore.Antiforgery": "3.1.0.0",
           "Microsoft.AspNetCore.Authentication.Abstractions": "3.1.0.0",
           "Microsoft.AspNetCore.Authentication.Cookies": "3.1.0.0",
@@ -479,6 +480,9 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "3.1.0",
           "Microsoft.Win32.SystemEvents": "4.7.0"
+        },
+        "compile": {
+          "ref/netcoreapp3.0/System.Drawing.Common.dll": {}
         }
       },
       "System.Security.AccessControl/4.7.0": {

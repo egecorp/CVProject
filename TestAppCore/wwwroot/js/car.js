@@ -44,7 +44,10 @@ var Car = function ()
     $("#Car_Card_BodyTypeId").val(this.BodyTypeId);
     $("#Car_Card_SeatsCount").val(this.SeatsCount);
     $("#Car_Card_Url").val(this.Url);
-    $("#Car_Card_CarImageId").val(this.CarImageId);
+
+    $('#Car_Card_CarImage').attr('src', me.server.GetImageUrl(this.CarImageId))
+
+
   }
 
   // Вернуть HTML строки в таблице
@@ -73,17 +76,15 @@ var Car = function ()
     this.BodyTypeId = $("#Car_Card_BodyTypeId").val();
     this.SeatsCount = $("#Car_Card_SeatsCount").val();
     this.Url = $("#Car_Card_Url").val();
-    this.CarImageId = $("#Car_Card_CarImageId").val();
 
     return {
-      Id: this.Id,
-      BrandId: this.BrandId,
+      Id: +this.Id,
+      BrandId: +this.BrandId,
       Name: this.Name,
-      CreateStamp: this.CreateStamp,
-      BodyTypeId: this.BodyTypeId,
-      SeatsCount: this.SeatsCount,
+      BodyTypeId: +this.BodyTypeId,
+      SeatsCount: +this.SeatsCount,
       Url: this.Url,
-      CarImageId: this.CarImageId
+      CarImageId: +this.CarImageId
     };
   }
 

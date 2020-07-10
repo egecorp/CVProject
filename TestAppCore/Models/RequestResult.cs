@@ -27,5 +27,19 @@ namespace TestAppCore.Models
         [JsonProperty]
         public Car OneCar { set; get; }
 
+        [JsonProperty]
+        public int ImageId { set; get; }
+
+        public static string GetErrorAnswer(string txt)
+        {
+            RequestResult answer = new RequestResult()
+            {
+                Error = txt
+            };
+
+            return JsonConvert.SerializeObject(answer);
+        }
+
+
     }
 }

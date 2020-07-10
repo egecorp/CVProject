@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using PagedList;
 using System.Data.Entity.Core.Mapping;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace TestAppCore.Data
 {
@@ -17,13 +18,7 @@ namespace TestAppCore.Data
     /// </summary>
     public static class DataSource
     {
-
         public const int CARS_PER_PAGE = 10;
-
-        static DataSource() 
-        { 
-
-        }
 
         /// <summary>
         /// Проинициализировать БД, создать при необходимости, добавить по умолчанию значения в справочники
@@ -47,7 +42,6 @@ namespace TestAppCore.Data
                     NeedSave = true;
                 }
 
-
                 if (ec.BDSetBodyType.Count() < 1)
                 {
                     List<BodyType> defaultBodyTypes = JsonConvert.DeserializeObject<List<BodyType>>(Properties.DBDefault.BodyType);
@@ -59,35 +53,37 @@ namespace TestAppCore.Data
                     NeedSave = true;
                 }
 
-
-
                 if (ec.BDSetCar.Count() < 1)
                 {
                     ec.BDSetCar.Add(new Car() { BodyTypeId = 1, BrandId = 1, CarImageId = 0, CreateStamp = DateTime.Now, Id = 1, Name = "1", SeatsCount = 13, Url = null });
                     NeedSave = true;
                 }
 
-
-
                 if (NeedSave) ec.SaveChanges();
                 
             }
 
-
-
         }
 
+        #region Car
         /// <summary>
         /// Вернуть одну страницу с автомобилями
         /// </summary>
         /// <param name="Page">Номер страницы начиная с 0</param>
         public static List<Car> GetCars(int Page)
         {
-            using (EFContext ec = new EFContext())
+            try
             {
-                List<Car> carList = ec.BDSetCar.OrderBy(x => x.Id).ToPagedList(Page + 1, CARS_PER_PAGE).ToList() ?? (new List<Car>());
-                return carList;
-            }            
+                using (EFContext ec = new EFContext())
+                {
+                    List<Car> carList = ec.BDSetCar.OrderBy(x => x.Id).ToPagedList(Page + 1, CARS_PER_PAGE).ToList() ?? (new List<Car>());
+                    return carList;
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -97,10 +93,17 @@ namespace TestAppCore.Data
         /// <returns></returns>
         public static int GetCarsPagesCount()
         {
-            using (EFContext ec = new EFContext())
+            try
             {
-                int res = (int)(ec.BDSetCar.Count() / CARS_PER_PAGE);
-                return (res == 0) ? 1 : res;
+                using (EFContext ec = new EFContext())
+                {
+                    int res = (int)((ec.BDSetCar.Count() - 1) / CARS_PER_PAGE);
+                    return (res <= 0) ? 0 : res;
+                }
+            }
+            catch
+            {
+                return 0;
             }
         }
 
@@ -110,17 +113,50 @@ namespace TestAppCore.Data
         /// <param name="carId">Идентификатор</param>
         public static Car GetCar(int carId)
         {
-            using (EFContext ec = new EFContext())
+            try
             {
-                Car oneCar = ec.BDSetCar.Find(carId);
-                return oneCar;
+                using (EFContext ec = new EFContext())
+                {
+                    Car oneCar = ec.BDSetCar.Find(carId);
+                    return oneCar;
+                }
+            }
+            catch 
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Проверить, существует ли дубль
+        /// </summary>
+        public static bool IsExistCar(Car sampleCar)
+        {
+            try
+            {
+                using (EFContext ec = new EFContext())
+                {
+                    Car Car = ec.BDSetCar.Where(
+                        x =>
+                            (x.Id != sampleCar.Id) &&
+                            (x.BodyTypeId == sampleCar.BodyTypeId) &&
+                            (x.BrandId == sampleCar.BrandId) &&
+                            (x.Name.ToLower() == sampleCar.Name.ToLower()) &&
+                            (x.SeatsCount == sampleCar.SeatsCount)
+                            ).FirstOrDefault();
+
+                    return Car != null;
+                }
+            }
+            catch
+            {
+                return false;
             }
         }
 
         /// <summary>
         /// Удалить модель автомобиля
         /// </summary>
-        /// <param name="carId">Идентификатор</param>
         public static void DeleteCar(Car oneCar)
         {
             using (EFContext ec = new EFContext())
@@ -144,16 +180,52 @@ namespace TestAppCore.Data
             }
         }
 
+        /// <summary>
+        /// Добавить модель автомобиля
+        /// </summary>
+        public static void AddCar(Car oneCar)
+        {
+            using (EFContext ec = new EFContext())
+            {
+                ec.BDSetCar.Add(oneCar);
+                ec.SaveChanges();
+            }
+        }
+
+
+        /// <summary>
+        /// Изменить модель автомобиля
+        /// </summary>
+        public static void EditCar(Car oneCar)
+        {
+            using (EFContext ec = new EFContext())
+            {
+
+                ec.BDSetCar.Attach(oneCar);
+                ec.Entry(oneCar).State = EntityState.Modified;
+                ec.SaveChanges();
+            }
+        }
+        #endregion
+
+        #region Brand
 
         /// <summary>
         /// Вернуть все бренды
         /// </summary>
         public static List<Brand> GetBrands()
         {
-            using (EFContext ec = new EFContext())
+            try
             {
-                List<Brand> brandList = ec.BDSetBrand.ToList() ?? (new List<Brand>());
-                return brandList;
+                using (EFContext ec = new EFContext())
+                {
+                    List<Brand> brandList = ec.BDSetBrand.ToList() ?? (new List<Brand>());
+                    return brandList;
+                }
+            }
+            catch 
+            {
+                return null;
             }
         }
 
@@ -162,36 +234,109 @@ namespace TestAppCore.Data
         /// </summary>
         public static Brand GetBrand(int Id)
         {
-            using (EFContext ec = new EFContext())
+            try
             {
-                Brand oneBrand = ec.BDSetBrand.Find(Id);
-                return oneBrand;
+                using (EFContext ec = new EFContext())
+                {
+                    Brand oneBrand = ec.BDSetBrand.Find(Id);
+                    return oneBrand;
+                }
+            }
+            catch 
+            {
+                return null;
             }
         }
 
+        #endregion
+
+        #region BodyType
 
         /// <summary>
         /// Вернуть все кузовы
         /// </summary>
         public static List<BodyType> GetBodyTypes()
         {
-            using (EFContext ec = new EFContext())
+            try
             {
-                List<BodyType> bodyTypeList = ec.BDSetBodyType.ToList() ?? (new List<BodyType>());
-                return bodyTypeList;
+                using (EFContext ec = new EFContext())
+                {
+                    List<BodyType> bodyTypeList = ec.BDSetBodyType.ToList() ?? (new List<BodyType>());
+                    return bodyTypeList;
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
+
         /// <summary>
         /// Вернуть кузов по Id
         /// </summary>
         public static BodyType GetBodyType(int Id)
         {
-            using (EFContext ec = new EFContext())
+            try
             {
-                BodyType oneBodyType = ec.BDSetBodyType.Find(Id);
-                return oneBodyType;
+                using (EFContext ec = new EFContext())
+                {
+                    BodyType oneBodyType = ec.BDSetBodyType.Find(Id);
+                    return oneBodyType;
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
+
+        #endregion
+
+        #region CarImage
+        /// <summary>
+        /// Добавить картинку модели
+        /// </summary>
+        public static void AddCarImage(CarImage oneCarImage)
+        {
+            using (EFContext ec = new EFContext())
+            {
+                ec.BDSetCarImage.Add(oneCarImage);
+                ec.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Изменить картинку модели
+        /// </summary>
+        public static void EditCarImage(CarImage oneCarImage)
+        {
+            using (EFContext ec = new EFContext())
+            {
+                ec.BDSetCarImage.Attach(oneCarImage);
+                ec.Entry(oneCarImage).State = EntityState.Modified;
+                ec.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Вернуть картинку модели
+        /// </summary>
+        public static CarImage GetCarImage(int Id)
+        {
+            try
+            {
+                using (EFContext ec = new EFContext())
+                {
+                    CarImage oneCarImage = ec.BDSetCarImage.Find(Id);
+                    return oneCarImage;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        #endregion
 
     }
 }

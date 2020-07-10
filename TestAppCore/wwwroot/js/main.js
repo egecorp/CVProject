@@ -33,18 +33,44 @@ function InitEvents()
     if (!me.currentCar) return;
     var postData = me.currentCar.SetFromCard();
 
-    console.log(postData);
+    if (!postData.CarImageId || (postData.CarImageId < 0))
+    {
+      alert('Необходимо сперва загрузить изображение');
+      return;
+    }
+
     if (me.currentCar.Id < 0)
     {
-      console.log('Create');
+      me.server.CreateOneCar(postData, function (data) {
+        $("#Car_Card_Modal").modal('hide');
+
+        if (data && Number.isFinite(data.PageCount))
+        {
+          me.PageCount = data.PageCount;
+          Nav_Open(me.PageCount);
+        }
+        else
+        {
+          Nav_Open(me.CurrentPage);
+        }
+        
+
+      });
+      
     }
     else
     {
-      console.log('Save');
+      me.server.EditOneCar(postData, function () {
+        $("#Car_Card_Modal").modal('hide');
+        Nav_Open(me.CurrentPage);
+      });
     }
-    
-
   });
+
+  $('#Car_Card_CarImage').click(function () {
+    $('#Car_Card_CarImageFile').trigger('click');
+  });
+  
 };
 
 
@@ -99,13 +125,13 @@ function LoadDataToNav()
     '</li>' +
     '     <li class="page-item ' + ((me.CurrentPage == 0) ? 'active' : '') + ' "><a class="page-link" href="#" onclick="Nav_Open(0)">1</a></li>';
 
-  for (var i = 1; i < me.PageCount; i++)
+  for (var i = 1; i <= me.PageCount; i++)
     {
     html += '     <li class="page-item ' + ((me.CurrentPage == i) ? 'active' : '') + '"><a class="page-link" href="#" onclick="Nav_Open(' + i +')">' + (i + 1) + '</a></li>';
     }
 
-  html += '<li class="page-item ' + ((me.CurrentPage >= me.PageCount - 1) ? 'disabled' : '') + '">' +
-    ' <a class="page-link" ' + ((me.CurrentPage >= me.PageCount - 1) ? '' : 'onclick="Nav_Next()"') + '  href="#" aria-disabled="' + ((me.CurrentPage >= me.PageCount - 1) ? 'true' : 'false') + '">Далее</a>' +
+  html += '<li class="page-item ' + ((me.CurrentPage >= me.PageCount ) ? 'disabled' : '') + '">' +
+    ' <a class="page-link" ' + ((me.CurrentPage >= me.PageCount ) ? '' : 'onclick="Nav_Next()"') + '  href="#" aria-disabled="' + ((me.CurrentPage >= me.PageCount ) ? 'true' : 'false') + '">Далее</a>' +
             '</li>';
   $("#Cars_Table_Nav").html(html);
 }
@@ -138,7 +164,7 @@ function Car_Delete_Function(Id)
     function ReViewTable(data) {
 
       me.PageCount = data.PageCount;
-      if ((me.CurrentPage >= me.PageCount) && (me.CurrentPage > 0)) me.CurrentPage--;
+      if ((me.CurrentPage > me.PageCount) && (me.CurrentPage > 0)) me.CurrentPage--;
       Nav_Open(me.CurrentPage);
     }
     me.server.DeleteOneCar(Id, ReViewTable);  
@@ -165,4 +191,42 @@ function Nav_Prev()
 {
   if (me.CurrentPage <= 0) return;
   GetPage(me.CurrentPage - 1);
+}
+
+
+
+const MAX_FILE_SIZE = 4 * 1024 * 1024;
+
+function CarImage_UploadFile(files)
+{
+
+  if (!files) return;
+  if (!files[0]) return;
+
+  if (files[0].size > MAX_FILE_SIZE) {
+    myParent.Popup_Alert("Превышен размера файла изображения");
+    $('#Car_Card_CarImageFile').val("")
+    return;
+  }
+
+  
+  me.server.UploadImage(files, function (jdata) {
+    if (jdata) {
+      var data = JSON.parse(jdata);
+      if (data.ImageId) {
+        me.currentCar.CarImageId = data.ImageId;
+      }
+      else {
+        me.currentCar.CarImageId = -1;
+      }
+    }
+    else {
+      me.currentCar.CarImageId = -1;
+    }
+
+    $('#Car_Card_CarImage').attr('src', me.server.GetImageUrl(me.currentCar.CarImageId));
+    $('#Car_Card_CarImageFile').val("");
+
+  });
+
 }

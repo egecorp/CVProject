@@ -30,24 +30,15 @@
                     </thead>
                     <tfoot>
                         <tr>
-                            <th>
+                            <td colspan="4">
                                 <nav aria-label="Page navigation example">
                                     <ul class="pagination justify-content-center" id="Cars_Table_Nav">
-                                        <li class="page-item disabled">
-                                            <a class="page-link" onclick="Nav_Prev()" href="#" tabindex="-1" aria-disabled="true">Назад</a>
-                                        </li>
-                                        @*<li class="page-item"><a class="page-link" href="#">1</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">3</a></li>*@
-                                        <li class="page-item">
-                                            <a class="page-link" onclick="Nav_Next()" href="#" aria-disabled="true">Далее</a>
-                                        </li>
                                     </ul>
                                 </nav>
-
+                            </td>
+                            <td colspan="2">
                                 <button class="btn btn-primary" id="Cars_Table_Add_Button" type="button">Добавить</button>
-
-                            </th>
+                            </td>
                         </tr>
                     </tfoot>
                     <tbody id="Cars_Table_Body">
@@ -61,8 +52,8 @@
         </main>
     </div>
 
-    <div class="modal" tabindex="-1" role="dialog" id="Car_Card_Modal">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" tabindex="-1" role="dialog" id="Car_Card_Modal">
+        <div class="modal-dialog  modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Редактирование модели автомобиля</h5>
@@ -71,48 +62,70 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="Car_Card_CreateStamp">Дата создания</label>
-                        <input type="datetime-local" readonly="readonly" class="form-control" id="Car_Card_CreateStamp" >
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="form-group">
+                                    <label for="Car_Card_CreateStamp">Дата создания</label>
+                                    <input type="datetime-local" readonly="readonly" class="form-control" id="Car_Card_CreateStamp">
+                                </div>
+                                <div class="form-group">
+                                    <label for="Car_Card_Id">Идентификатор</label>
+                                    <input type="text" readonly="readonly" class="form-control" id="Car_Card_Id" placeholder="Идентификатор">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="Car_Card_CarImageId">Изображение (нажмите чтобы изменить)</label>
+                                    <input type="file" class="form-control-file" id="Car_Card_CarImageFile" style="display:none !important" onchange="CarImage_UploadFile(this.files)">
+                                    
+                                </div>
+
+                                <div class="card" style="width: 18rem;">
+                                    <img class="card-img-top" id="Car_Card_CarImage" src="/img/noimage.svg" alt="Выберите изображение">
+                                    <div class="card-body">
+                                        <p class="card-text"></p>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="col-sm">
+                                <div class="form-group">
+                                    <label for="Car_Card_Name">Наименование модели</label>
+                                    <input type="text" class="form-control" id="Car_Card_Name" placeholder="Наименование модели">
+                                </div>
+                                <div class="form-group">
+                                    <label for="Car_Card_BrandId">Бренд</label>
+                                    <select class="custom-select" id="Car_Card_BrandId">
+                                        @foreach (Brand br in ViewBag.Brands)
+                                        {
+                                            <option value="@Html.Raw(br.Id)">@Html.Raw(br.Name)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Car_Card_BodyTypeId">Тип кузова</label>
+                                    <select class="custom-select" id="Car_Card_BodyTypeId">
+                                        @foreach (BodyType bt in ViewBag.BodyTypes)
+                                        {
+                                            <option value="@Html.Raw(bt.Id)">@Html.Raw(bt.Name)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Car_Card_SeatsCount">Количество сидений</label>
+                                    <input type="number" class="form-control" id="Car_Card_SeatsCount" placeholder="Количество сидений">
+                                </div>
+                                <div class="form-group">
+                                    <label for="Car_Card_Url">Сайт</label>
+                                    <input type="url" class="form-control" id="Car_Card_Url" placeholder="Сайт">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="Car_Card_Id">Идентификатор</label>
-                        <input type="text" readonly="readonly" class="form-control" id="Car_Card_Id" placeholder="Идентификатор">
-                    </div>
-                    <div class="form-group">
-                        <label for="Car_Card_Name">Наименование модели</label>
-                        <input type="text" class="form-control" id="Car_Card_Name" placeholder="Наименование модели">
-                    </div>
-                    <div class="form-group">
-                        <label for="Car_Card_BrandId">Бренд</label>
-                        <select class="custom-select" id="Car_Card_BrandId">
-                            @foreach (Brand br in ViewBag.Brands)
-                            {
-                            <option value="@Html.Raw(br.Id)">@Html.Raw(br.Name)</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="Car_Card_BodyTypeId">Тип кузова</label>
-                        <select class="custom-select" id="Car_Card_BodyTypeId">
-                            @foreach (BodyType bt in ViewBag.BodyTypes)
-                            {
-                                <option value="@Html.Raw(bt.Id)">@Html.Raw(bt.Name)</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="Car_Card_SeatsCount">Количество сидений</label>
-                        <input type="number" class="form-control" id="Car_Card_SeatsCount" placeholder="Количество сидений">
-                    </div>
-                    <div class="form-group">
-                        <label for="Car_Card_Url">Сайт</label>
-                        <input type="url" class="form-control" id="Car_Card_Url" placeholder="Сайт">
-                    </div>
-                    <div class="form-group">
-                        <label for="Car_Card_CarImageId">Изображение</label>
-                        <input type="text" class="form-control" id="Car_Card_CarImageId" placeholder="Изображение">
-                    </div>
+
+
+                
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" id="Car_Card_Save_Button">Сохранить</button>

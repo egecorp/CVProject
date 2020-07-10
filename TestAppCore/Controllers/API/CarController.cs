@@ -25,21 +25,12 @@ namespace TestAppCore.Controllers
             int PagesCount = DataSource.GetCarsPagesCount();
 
             int selectedPage = 0;
-            if (Page == "last")
-            {
-                selectedPage = PagesCount - 1;
-            }
-            else
-            {
-                if (!int.TryParse(Page, out selectedPage)) selectedPage = 0;
-            }
+            if (!int.TryParse(Page, out selectedPage)) selectedPage = 0;
 
-            if ((selectedPage < 0) || (selectedPage >= PagesCount)) 
+            if ((selectedPage < 0) || (selectedPage > PagesCount)) 
             {
-                return GetErrorAnswer("Укажите корректный номер страницы в интервале от 1 до " + PagesCount.ToString());
+                return RequestResult.GetErrorAnswer("Укажите корректный номер страницы в интервале от 1 до " + PagesCount.ToString());
             }
-
-            if (selectedPage > PagesCount - 1) selectedPage = PagesCount - 1;
 
             List<Car> carList = DataSource.GetCars(selectedPage);
 
@@ -60,13 +51,13 @@ namespace TestAppCore.Controllers
 
             if (!int.TryParse(Id, out carId))
             {
-                return GetErrorAnswer("Укажите корректный идентификатор модели автомобиля");
+                return RequestResult.GetErrorAnswer("Укажите корректный идентификатор модели автомобиля");
             }
 
             Car oneCar = DataSource.GetCar(carId);
             if (oneCar == null) 
             {
-                return GetErrorAnswer("Не удалось найти модель автомобиля");
+                return RequestResult.GetErrorAnswer("Не удалось найти модель автомобиля");
             }
 
             RequestResult answer = new RequestResult()
@@ -83,97 +74,119 @@ namespace TestAppCore.Controllers
 
             if (!int.TryParse(Id, out carId))
             {
-                return GetErrorAnswer("Укажите корректный идентификатор модели автомобиля");
+                return RequestResult.GetErrorAnswer("Укажите корректный идентификатор модели автомобиля");
             }
 
-            Car oneCar = DataSource.GetCar(carId);
-            if (oneCar == null)
+            try
             {
-                return GetErrorAnswer("Не удалось найти модель автомобиля");
+                Car oneCar = DataSource.GetCar(carId);
+                if (oneCar == null)
+                {
+                    return RequestResult.GetErrorAnswer("Не удалось найти модель автомобиля");
+                }
+
+                DataSource.DeleteCar(oneCar);
+
+                int PagesCount = DataSource.GetCarsPagesCount();
+
+                RequestResult answer = new RequestResult()
+                {
+                    PageCount = PagesCount
+                };
+
+                return JsonConvert.SerializeObject(answer);
             }
-
-            DataSource.DeleteCar(oneCar);
-
-            int PagesCount = DataSource.GetCarsPagesCount();
-
-            RequestResult answer = new RequestResult()
+            catch (Exception ee)
             {
-                PageCount = PagesCount
-            };
-
-            return JsonConvert.SerializeObject(answer);
+                _logger.LogError(ee.Message + Environment.NewLine + ee.StackTrace);
+                return RequestResult.GetErrorAnswer("При выполнении запроса произошла ошибка");
+            }
         }
 
-
-
-        public string CrateCar([FromBody] Car value)
-        {
-            int carId = -1;
-
-            if (!int.TryParse(Id, out carId))
-            {
-                return GetErrorAnswer("Укажите корректный идентификатор модели автомобиля");
-            }
-
-            Car oneCar = DataSource.GetCar(carId);
-            if (oneCar == null)
-            {
-                return GetErrorAnswer("Не удалось найти модель автомобиля");
-            }
-
-            DataSource.DeleteCar(oneCar);
-
-            int PagesCount = DataSource.GetCarsPagesCount();
-
-            RequestResult answer = new RequestResult()
-            {
-                PageCount = PagesCount
-            };
-
-            return JsonConvert.SerializeObject(answer);
-        }
-
-
-
-        public string DeleteCar([FromBody] Car value)
-        {
-            int carId = -1;
-
-            if (!int.TryParse(Id, out carId))
-            {
-                return GetErrorAnswer("Укажите корректный идентификатор модели автомобиля");
-            }
-
-            Car oneCar = DataSource.GetCar(carId);
-            if (oneCar == null)
-            {
-                return GetErrorAnswer("Не удалось найти модель автомобиля");
-            }
-
-            DataSource.DeleteCar(oneCar);
-
-            int PagesCount = DataSource.GetCarsPagesCount();
-
-            RequestResult answer = new RequestResult()
-            {
-                PageCount = PagesCount
-            };
-
-            return JsonConvert.SerializeObject(answer);
-        }
-
-
-
-        // Перенести
-        public string GetErrorAnswer(string txt)
-        {
-            RequestResult answer = new RequestResult()
-            {
-                Error = txt
-            };
-
-            return JsonConvert.SerializeObject(answer);
-        }
         
+        [HttpPost]
+        public string CreateCar([FromBody] Car value)
+        {
+            if (value == null)
+            {
+                return RequestResult.GetErrorAnswer("Не передан объект для создания");
+            }
+
+            try
+            {
+                string err = value.PutValidate();
+                if (err != null)
+                {
+                    return RequestResult.GetErrorAnswer(err);
+                }
+
+                DataSource.AddCar(value);
+
+
+                int PagesCount = DataSource.GetCarsPagesCount();
+
+                RequestResult answer = new RequestResult()
+                {
+                    PageCount = PagesCount
+                };
+
+                return JsonConvert.SerializeObject(answer);
+            }
+            catch (Exception ee)
+            {
+                _logger.LogError(ee.Message + Environment.NewLine + ee.StackTrace);
+                return RequestResult.GetErrorAnswer("При выполнении запроса произошла ошибка");
+            }
+        }
+
+
+        [HttpPost]
+        public string EditCar([FromBody] Car value)
+        {
+            if (value == null)
+            {
+                return RequestResult.GetErrorAnswer("Не передан объект для создания");
+            }
+
+            try
+            {
+
+                string err = value.PostValidate();
+                if (err != null)
+                {
+                    return RequestResult.GetErrorAnswer(err);
+                }
+
+                Car existCar = DataSource.GetCar(value.Id);
+                if (existCar == null)
+                {
+                    return RequestResult.GetErrorAnswer("Не удалось найти модель с данным идентификатором");
+                }
+
+                value.LoadUnchangedData(existCar);
+
+                DataSource.EditCar(value);
+
+
+                int PagesCount = DataSource.GetCarsPagesCount();
+
+                RequestResult answer = new RequestResult()
+                {
+                    PageCount = PagesCount
+                };
+
+                return JsonConvert.SerializeObject(answer);
+            }
+            catch(Exception ee)
+            {
+                _logger.LogError(ee.Message + Environment.NewLine + ee.StackTrace);
+                return RequestResult.GetErrorAnswer("При выполнении запроса произошла ошибка");
+            }
+        }
+
+
+
+
+
     }
 }

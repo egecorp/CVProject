@@ -1,7 +1,8 @@
 ﻿// Класс описывает методы для связи с сервером
 var Server = function ()
 {
-  this.APIURL = '/API';
+	this.APIURL = '/API';
+	this.IMAGEURL = '/Image';
 
 	// Функция выполняет запрос и вызывает callBackFunction в случае успеха с параметром callBackParam и callBackFailFunction в случае ошибки
 	this.PerformPostRequest = function (url, obj, callBackFunction, callBackFailFunction, callBackParam) {
@@ -44,6 +45,51 @@ var Server = function ()
 	}
 
 
+
+	// Функция загружает файл на сервер в файловую систему
+	this.UploadImage = function (files, callBackFunction, callBackFailFunction, callBackParam) {
+		var url = this.IMAGEURL + '/Upload';
+
+		var myCallBackFunction = callBackFunction;
+		var myCallBackFailFunction = callBackFailFunction || this.DefaultAlertFunction;
+		var myCallBackParam = callBackParam;
+
+		var fd = new FormData();
+		fd.append("upload", files[0]);
+
+
+
+
+		var request = $.ajax({
+			url: url,
+			data: fd,
+			type: "POST",
+			contentType: false,
+			processData: false,
+			context: window
+		});
+
+		request.done(function (answer) {
+			if (!answer) {
+				myCallBackFailFunction('Произошла неизвестная ошибка', myCallBackParam);
+				return;
+			}
+
+			if (answer.Error) {
+				myCallBackFailFunction(answer.Error, myCallBackParam);
+				return;
+			}
+			myCallBackFunction(answer, myCallBackParam);
+		});
+
+		request.fail(function (jqxhr, textStatus, error) {
+			myCallBackFailFunction(error, myCallBackParam);
+		});
+
+	}
+
+
+
   this.GetCarPage = function (Page, GoodsResultCallBack)
 	{
 		var myGoodsResultCallBack = GoodsResultCallBack;
@@ -75,12 +121,41 @@ var Server = function ()
 		this.PerformPostRequest('Car/DeleteCar?Id=' + Id, {}, GoodResult);
 
 	}
-	
+
+
+	this.CreateOneCar = function (postData, GoodsResultCallBack) {
+		var myGoodsResultCallBack = GoodsResultCallBack;
+		function GoodResult(data) {
+			myGoodsResultCallBack(data);
+		}
+
+		this.PerformPostRequest('Car/CreateCar', postData, GoodResult);
+
+	}
+
+
+	this.EditOneCar = function (postData, GoodsResultCallBack) {
+		var myGoodsResultCallBack = GoodsResultCallBack;
+		function GoodResult(data) {
+			myGoodsResultCallBack(data);
+		}
+
+		this.PerformPostRequest('Car/EditCar', postData, GoodResult);
+
+	}
 
 	this.DefaultAlertFunction = function (txt)
 	{
 		alert(txt);
+	}
+
+
+	this.GetImageUrl = function (Id)
+	{
+		return this.IMAGEURL + '/Get?Id=' + Id;
+
   }
+
 
 }
 

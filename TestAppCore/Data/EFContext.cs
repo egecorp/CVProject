@@ -19,5 +19,6 @@ namespace TestAppCore.Data
 
         public DbSet<Car> BDSetCar { set; get; }
 
+        public DbSet<CarImage> BDSetCarImage { set; get; }
     }
 }

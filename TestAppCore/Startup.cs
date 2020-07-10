@@ -54,7 +54,7 @@ namespace TestAppCore
 
                 endpoints.MapControllerRoute(
                     name: "api",
-                    pattern: "API/{controller=Home}/{action=Index}/{id?}");
+                    pattern: "API/{controller}/{action}");
             });
         }
     }
