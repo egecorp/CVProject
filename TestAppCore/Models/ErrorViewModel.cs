@@ -1,6 +1,6 @@
 using System;
 
-namespace TestAppCore.Models
+namespace CVProject.Models
 {
     public class ErrorViewModel
     {

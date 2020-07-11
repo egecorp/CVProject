@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace TestAppCore.Models
+namespace CVProject.Models
 {
     /// <summary>
     /// Универсальный класс для ответов сервера на запросы из фронта
@@ -22,10 +22,10 @@ namespace TestAppCore.Models
         public int PageCount { set; get; }
 
         [JsonProperty]
-        public List<Car> CarList { set; get; }
+        public List<VCar> CarList { set; get; }
 
         [JsonProperty]
-        public Car OneCar { set; get; }
+        public VCar OneCar { set; get; }
 
         [JsonProperty]
         public int ImageId { set; get; }

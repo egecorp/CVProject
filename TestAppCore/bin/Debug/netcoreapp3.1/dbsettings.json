@@ -1,0 +1,43 @@
+{
+  "ConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=CBProjectDB;Trusted_Connection=True;",
+
+  "DefaultBodyType": [
+    {
+      "Name": "Седан"
+    },
+    {
+      "Name": "Хэтчбек"
+    },
+    {
+      "Name": "Универсал"
+    },
+    {
+      "Name": "Минивэн"
+    },
+    {
+      "Name": "Внедорожник"
+    },
+    {
+      "Name": "Купе"
+    }
+  ],
+
+  "DefaultBrand": [
+    {
+      "Name": "Audi"
+    },
+    {
+      "Name": "Ford"
+    },
+    {
+      "Name": "Jeep"
+    },
+    {
+      "Name": "Nissan"
+    },
+    {
+      "Name": "Toyota"
+    }
+  ]
+}
+ 

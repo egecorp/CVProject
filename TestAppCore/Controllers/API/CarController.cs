@@ -5,21 +5,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using TestAppCore.Models;
-using TestAppCore.Data;
+using CVProject.Models;
+using CVProject.Data;
 using Newtonsoft.Json;
+using CVProjectCore.Logger;
 
-namespace TestAppCore.Controllers
+namespace CVProject.Controllers
 {
     public class CarController : Controller
     {
-        private readonly ILogger<CarController> _logger;
-
-        public CarController(ILogger<CarController> logger)
+        private FLogger Logger = FLogger.Get("CarController");
+        public CarController()
         {
-            _logger = logger;
+
         }
 
+        [HttpPost]
         public string GetPage([FromQuery]string Page)
         {
             int PagesCount = DataSource.GetCarsPagesCount();
@@ -38,13 +39,13 @@ namespace TestAppCore.Controllers
             {
                 CurrentPage = selectedPage,
                 PageCount = PagesCount,
-                CarList = carList
+                CarList = carList.Select(x => new VCar(x)).ToList()
             };
 
             return JsonConvert.SerializeObject(answer);
         }
 
-
+        [HttpPost]
         public string GetCar([FromQuery] string Id)
         {
             int carId = -1;
@@ -62,12 +63,13 @@ namespace TestAppCore.Controllers
 
             RequestResult answer = new RequestResult()
             {
-                OneCar = oneCar
+                OneCar = new VCar(oneCar)
             };
 
             return JsonConvert.SerializeObject(answer);
         }
 
+        [HttpPost]
         public string DeleteCar([FromQuery] string Id)
         {
             int carId = -1;
@@ -85,7 +87,13 @@ namespace TestAppCore.Controllers
                     return RequestResult.GetErrorAnswer("Не удалось найти модель автомобиля");
                 }
 
+                VCar vCar = new VCar(oneCar);
+                Logger.Log("Удаление модели " + vCar.Name + "  " + vCar.BrandName);
+
                 DataSource.DeleteCar(oneCar);
+
+
+                
 
                 int PagesCount = DataSource.GetCarsPagesCount();
 
@@ -98,14 +106,14 @@ namespace TestAppCore.Controllers
             }
             catch (Exception ee)
             {
-                _logger.LogError(ee.Message + Environment.NewLine + ee.StackTrace);
+                Logger.Error(ee.Message + Environment.NewLine + ee.StackTrace);
                 return RequestResult.GetErrorAnswer("При выполнении запроса произошла ошибка");
             }
         }
 
         
         [HttpPost]
-        public string CreateCar([FromBody] Car value)
+        public string CreateCar([FromBody] VCar value)
         {
             if (value == null)
             {
@@ -122,6 +130,7 @@ namespace TestAppCore.Controllers
 
                 DataSource.AddCar(value);
 
+                Logger.Log("Добавление модели " +  value.Name + " " +  value.BrandName);
 
                 int PagesCount = DataSource.GetCarsPagesCount();
 
@@ -134,14 +143,14 @@ namespace TestAppCore.Controllers
             }
             catch (Exception ee)
             {
-                _logger.LogError(ee.Message + Environment.NewLine + ee.StackTrace);
+                Logger.Error(ee.Message + Environment.NewLine + ee.StackTrace);
                 return RequestResult.GetErrorAnswer("При выполнении запроса произошла ошибка");
             }
         }
 
 
         [HttpPost]
-        public string EditCar([FromBody] Car value)
+        public string EditCar([FromBody] VCar value)
         {
             if (value == null)
             {
@@ -150,7 +159,6 @@ namespace TestAppCore.Controllers
 
             try
             {
-
                 string err = value.PostValidate();
                 if (err != null)
                 {
@@ -162,7 +170,9 @@ namespace TestAppCore.Controllers
                 {
                     return RequestResult.GetErrorAnswer("Не удалось найти модель с данным идентификатором");
                 }
-
+                
+                Logger.Log("Изменение модели " +  value.Name + " " + value.BrandName);
+                
                 value.LoadUnchangedData(existCar);
 
                 DataSource.EditCar(value);
@@ -179,7 +189,7 @@ namespace TestAppCore.Controllers
             }
             catch(Exception ee)
             {
-                _logger.LogError(ee.Message + Environment.NewLine + ee.StackTrace);
+                Logger.Error(ee.Message + Environment.NewLine + ee.StackTrace);
                 return RequestResult.GetErrorAnswer("При выполнении запроса произошла ошибка");
             }
         }

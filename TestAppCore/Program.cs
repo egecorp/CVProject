@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using TestAppCore.Data;
+using CVProject.Data;
 
-namespace TestAppCore
+namespace CVProject
 {
     public class Program
     {

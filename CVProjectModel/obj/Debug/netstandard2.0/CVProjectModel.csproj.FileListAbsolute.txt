@@ -1,0 +1,9 @@
+F:\CVProject\CVProjectModel\bin\Debug\netstandard2.0\CVProjectModel.deps.json
+F:\CVProject\CVProjectModel\bin\Debug\netstandard2.0\CVProjectModel.dll
+F:\CVProject\CVProjectModel\obj\Debug\netstandard2.0\CVProjectModel.csprojAssemblyReference.cache
+F:\CVProject\CVProjectModel\obj\Debug\netstandard2.0\CVProjectModel.AssemblyInfoInputs.cache
+F:\CVProject\CVProjectModel\obj\Debug\netstandard2.0\CVProjectModel.AssemblyInfo.cs
+F:\CVProject\CVProjectModel\obj\Debug\netstandard2.0\CVProjectModel.csproj.CoreCompileInputs.cache
+F:\CVProject\CVProjectModel\bin\Debug\netstandard2.0\CVProjectModel.pdb
+F:\CVProject\CVProjectModel\obj\Debug\netstandard2.0\CVProjectModel.dll
+F:\CVProject\CVProjectModel\obj\Debug\netstandard2.0\CVProjectModel.pdb

@@ -24,12 +24,10 @@ var Server = function ()
 
 		request.done(function (answer)
 		{
-			if (!answer)
-			{
-				myCallBackFailFunction('Произошла неизвестная ошибка', myCallBackParam);
+			if (!answer) {
+				myCallBackFailFunction('Неизвестная ошибка выполнения запроса', myCallBackParam);
 				return;
 			}
-
 			if (answer.Error)
 			{
 				myCallBackFailFunction(answer.Error, myCallBackParam);
@@ -43,8 +41,6 @@ var Server = function ()
 			myCallBackFailFunction(error, myCallBackParam);
 		});
 	}
-
-
 
 	// Функция загружает файл на сервер в файловую систему
 	this.UploadImage = function (files, callBackFunction, callBackFailFunction, callBackParam) {
@@ -69,11 +65,14 @@ var Server = function ()
 			context: window
 		});
 
-		request.done(function (answer) {
-			if (!answer) {
-				myCallBackFailFunction('Произошла неизвестная ошибка', myCallBackParam);
+		request.done(function (jdata) {
+
+			if (!jdata) {
+				myCallBackFailFunction('Неизвестная ошибка выполнения запроса', myCallBackParam);
 				return;
 			}
+
+			var answer = JSON.parse(jdata);
 
 			if (answer.Error) {
 				myCallBackFailFunction(answer.Error, myCallBackParam);
@@ -88,8 +87,7 @@ var Server = function ()
 
 	}
 
-
-
+  // Получить страницу моделей с сервера
   this.GetCarPage = function (Page, GoodsResultCallBack)
 	{
 		var myGoodsResultCallBack = GoodsResultCallBack;
@@ -102,6 +100,7 @@ var Server = function ()
 
   }
 
+	// Получить одну модель с сервера
 	this.GetOneCar = function (Id, GoodsResultCallBack) {
 		var myGoodsResultCallBack = GoodsResultCallBack;
 		function GoodResult(data) {
@@ -112,50 +111,44 @@ var Server = function ()
 
 	}
 
+	// Удалить одну модель
 	this.DeleteOneCar = function (Id, GoodsResultCallBack) {
 		var myGoodsResultCallBack = GoodsResultCallBack;
 		function GoodResult(data) {
 			myGoodsResultCallBack(data);
 		}
-
 		this.PerformPostRequest('Car/DeleteCar?Id=' + Id, {}, GoodResult);
-
 	}
 
-
+	// Создать одну модель
 	this.CreateOneCar = function (postData, GoodsResultCallBack) {
 		var myGoodsResultCallBack = GoodsResultCallBack;
 		function GoodResult(data) {
 			myGoodsResultCallBack(data);
 		}
-
 		this.PerformPostRequest('Car/CreateCar', postData, GoodResult);
-
 	}
 
-
+	// Отредактировать одну модель
 	this.EditOneCar = function (postData, GoodsResultCallBack) {
 		var myGoodsResultCallBack = GoodsResultCallBack;
 		function GoodResult(data) {
 			myGoodsResultCallBack(data);
 		}
-
 		this.PerformPostRequest('Car/EditCar', postData, GoodResult);
-
 	}
 
+	// Вывод сообщения об ошибке по умолчанию
 	this.DefaultAlertFunction = function (txt)
 	{
 		alert(txt);
 	}
 
-
+	// Вернить URL для картинки модели
 	this.GetImageUrl = function (Id)
 	{
 		return this.IMAGEURL + '/Get?Id=' + Id;
-
   }
-
 
 }
 

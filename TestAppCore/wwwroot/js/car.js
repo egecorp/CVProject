@@ -40,7 +40,16 @@ var Car = function ()
     }
     $("#Car_Card_BrandId").val(this.BrandId);
     $("#Car_Card_Name").val(this.Name);
-    $("#Car_Card_CreateStamp").val(this.CreateStamp);
+
+    if (this.CreateStamp)
+    {
+      $("#Car_Card_CreateStamp").val(this.CreateStamp.substr(0, 16));
+    }
+    else
+    {
+      $("#Car_Card_CreateStamp").val(null);
+    }
+
     $("#Car_Card_BodyTypeId").val(this.BodyTypeId);
     $("#Car_Card_SeatsCount").val(this.SeatsCount);
     $("#Car_Card_Url").val(this.Url);
@@ -50,7 +59,7 @@ var Car = function ()
 
   }
 
-  // Вернуть HTML строки в таблице
+  // Вернуть HTML строки в таблице моделей
   this.GetHTML = function ()
   {
     var tr = '<tr>';

@@ -5,51 +5,49 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using TestAppCore.Models;
-using TestAppCore.Data;
+using CVProject.Models;
+using CVProject.Data;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Drawing;
+using CVProjectCore.Logger;
 
-namespace TestAppCore.Controllers
+namespace CVProject.Controllers
 {
     public class ImageController : Controller
     {
+
+        private FLogger Logger = FLogger.Get("ImageController");
+
         private const string  NOIMAGE_FILENAME_PART = @"~/img/noimage.svg";
 
-        private readonly ILogger<ImageController> _logger;
+        private const string JPG_MIME = "image/jpeg";
+        private const string PNG_MIME = "image/png";
+        private const string SVG_MIME = "image/svg+xml";
 
-        public ImageController(ILogger<ImageController> logger)
+
+        public ImageController()
         {
-            _logger = logger;
+
         }
 
         public FileResult Get([FromQuery]string Id)
         {
-            //string noImagePath = Path.Combine(Directory.GetCurrentDirectory(), NOIMAGE_FILENAME_PART);
-
-
             int imgId = 0;
             if (!int.TryParse(Id, out imgId)) imgId = 0;
 
-            if (imgId < 1) return File(NOIMAGE_FILENAME_PART, "image/svg+xml");
+            if (imgId < 1) return File(NOIMAGE_FILENAME_PART, SVG_MIME);
 
             CarImage oneCarImage = DataSource.GetCarImage(imgId);
 
             if (oneCarImage == null)
             {
-                return File(NOIMAGE_FILENAME_PART, "image/svg+xml");
+                return File(NOIMAGE_FILENAME_PART, SVG_MIME);
             }
-
             return File(oneCarImage.FileData, oneCarImage.FileType);
-
-            /*
-            if (fs.Extension.ToLower() == "png") return File(fName, "image/png");
-            if ((fs.Extension.ToLower() == "jpeg") || (fs.Extension.ToLower() == "jpg")) return File(fName, "image/jpeg");
-
-            return File(NOIMAGE_FILENAME_PART, "image/svg+xml");*/
         }
+
 
 
         [HttpPost]
@@ -64,7 +62,12 @@ namespace TestAppCore.Controllers
 
             IFormFile imgFile = upload[0];
 
-            Console.WriteLine(imgFile.ContentType);
+            string currentContentType = (imgFile.ContentType ?? "").ToLower();
+
+            if ((currentContentType != JPG_MIME) && (currentContentType != PNG_MIME))
+            {
+                return RequestResult.GetErrorAnswer("Неверный формат файла. Поддерживаются только файлы в формате PNG и JPG");
+            }
 
             try
             {
@@ -74,7 +77,7 @@ namespace TestAppCore.Controllers
             }
             catch (Exception ee)
             {
-                _logger.LogError(ee.StackTrace + Environment.NewLine + ee.Message);
+                Logger.Error(ee.StackTrace + Environment.NewLine + ee.Message);
                 return RequestResult.GetErrorAnswer("Ошибка обработки файла");
             }
 
@@ -89,11 +92,11 @@ namespace TestAppCore.Controllers
             }
             catch (Exception ee)
             {
-                _logger.LogError(ee.StackTrace + Environment.NewLine + ee.Message);
+                Logger.Error(ee.StackTrace + Environment.NewLine + ee.Message);
                 return RequestResult.GetErrorAnswer("Ошибка обработки изображения");
             }
 
-            CarImage oneImage = new CarImage(bmpStream, imgFile.ContentType);
+            VCarImage oneImage = new VCarImage(bmpStream, currentContentType);
 
             DataSource.AddCarImage(oneImage);
 

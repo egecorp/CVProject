@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TestAppCore.Properties {
+namespace CVProjectCore.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace TestAppCore.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TestAppCore.Properties.DBDefault", typeof(DBDefault).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CVProjectCore.Properties.DBDefault", typeof(DBDefault).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

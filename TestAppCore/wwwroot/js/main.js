@@ -16,15 +16,12 @@ $(function () {
 
 function InitEvents()
 {
-  $("Main_Add_Button").click(function () {
-    console.log("Нажата кнопка Добавить");
-  });
 
   $("#Cars_Table_Add_Button").click(function () {
 
     me.currentCar = new Car();
     me.currentCar.ViewToCard();
-    $("#Car_Card_Modal").modal('show');
+    $("#Car_Card_Modal").modal({ backdrop: 'static' });
    
   });
 
@@ -52,9 +49,8 @@ function InitEvents()
         else
         {
           Nav_Open(me.CurrentPage);
-        }
-        
-
+        }       
+        ShowAlertResult("Модель успешно создана");
       });
       
     }
@@ -63,6 +59,7 @@ function InitEvents()
       me.server.EditOneCar(postData, function () {
         $("#Car_Card_Modal").modal('hide');
         Nav_Open(me.CurrentPage);
+        ShowAlertResult("Модель успешно изменена");
       });
     }
   });
@@ -72,8 +69,6 @@ function InitEvents()
   });
   
 };
-
-
 
 
 function GetPage(PageNumber)
@@ -95,9 +90,6 @@ function GetPage(PageNumber)
     }
     LoadDataToTable(carList);
     LoadDataToNav();
-
-    console.log(data);
-    
   }
   me.server.GetCarPage(PageNumber, ViewTable);  
 }
@@ -149,7 +141,7 @@ function Car_Edit_Function(Id)
     me.currentCar = new Car();
     me.currentCar.LoadFromServer(data.OneCar);
     me.currentCar.ViewToCard();
-    $("#Car_Card_Modal").modal('show');
+    $("#Car_Card_Modal").modal({ backdrop: 'static' });
   }
   me.server.GetOneCar(Id, ViewCard);  
 
@@ -166,6 +158,7 @@ function Car_Delete_Function(Id)
       me.PageCount = data.PageCount;
       if ((me.CurrentPage > me.PageCount) && (me.CurrentPage > 0)) me.CurrentPage--;
       Nav_Open(me.CurrentPage);
+      ShowAlertResult("Модель успешно удалена");
     }
     me.server.DeleteOneCar(Id, ReViewTable);  
 
@@ -194,7 +187,6 @@ function Nav_Prev()
 }
 
 
-
 const MAX_FILE_SIZE = 4 * 1024 * 1024;
 
 function CarImage_UploadFile(files)
@@ -210,15 +202,9 @@ function CarImage_UploadFile(files)
   }
 
   
-  me.server.UploadImage(files, function (jdata) {
-    if (jdata) {
-      var data = JSON.parse(jdata);
-      if (data.ImageId) {
-        me.currentCar.CarImageId = data.ImageId;
-      }
-      else {
-        me.currentCar.CarImageId = -1;
-      }
+  me.server.UploadImage(files, function (data) {
+    if (data.ImageId) {
+      me.currentCar.CarImageId = data.ImageId;
     }
     else {
       me.currentCar.CarImageId = -1;
@@ -226,7 +212,31 @@ function CarImage_UploadFile(files)
 
     $('#Car_Card_CarImage').attr('src', me.server.GetImageUrl(me.currentCar.CarImageId));
     $('#Car_Card_CarImageFile').val("");
-
+    ShowAlertResult("Изображение загруженно, не забудьте сохранить модель");
   });
+
+}
+
+
+var LastAlertId = 0;
+function ShowAlertResult(txt)
+{
+  var alertId = 'Last_Alret_' + (LastAlertId++);
+  var alertDiv =  $('<div/>', {
+    id: alertId,
+    class: 'alert alert-primary',
+    role: 'alert',
+    style: 'position:fixed; left:0; top:0; width:100%; z-index:9000;',
+    html: txt
+  });
+
+  $('body').append(alertDiv);
+
+  setTimeout(function () {
+    $("#" + alertId).fadeOut();
+    setTimeout( function () {
+      $("#" + alertId).remove();
+    }, 500);
+  }, 2000);
 
 }

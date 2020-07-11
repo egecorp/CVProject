@@ -5,25 +5,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using TestAppCore.Data;
-using TestAppCore.Models;
+using CVProject.Data;
+using CVProject.Models;
 
-namespace TestAppCore.Controllers
+namespace CVProject.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController()
         {
-            _logger = logger;
+
         }
 
         public IActionResult Index()
         {
             ViewBag.Brands = DataSource.GetBrands();
             ViewBag.BodyTypes = DataSource.GetBodyTypes();
-
 
             return View();
         }
