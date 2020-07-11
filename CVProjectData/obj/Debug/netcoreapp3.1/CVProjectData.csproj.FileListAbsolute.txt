@@ -1,0 +1,12 @@
+F:\CVProject\CVProjectData\bin\Debug\netcoreapp3.1\CVProjectData.deps.json
+F:\CVProject\CVProjectData\bin\Debug\netcoreapp3.1\CVProjectData.dll
+F:\CVProject\CVProjectData\bin\Debug\netcoreapp3.1\CVProjectData.pdb
+F:\CVProject\CVProjectData\bin\Debug\netcoreapp3.1\CVProjectModel.dll
+F:\CVProject\CVProjectData\bin\Debug\netcoreapp3.1\CVProjectModel.pdb
+F:\CVProject\CVProjectData\obj\Debug\netcoreapp3.1\CVProjectData.csprojAssemblyReference.cache
+F:\CVProject\CVProjectData\obj\Debug\netcoreapp3.1\CVProjectData.AssemblyInfoInputs.cache
+F:\CVProject\CVProjectData\obj\Debug\netcoreapp3.1\CVProjectData.AssemblyInfo.cs
+F:\CVProject\CVProjectData\obj\Debug\netcoreapp3.1\CVProjectData.csproj.CoreCompileInputs.cache
+F:\CVProject\CVProjectData\obj\Debug\netcoreapp3.1\CVProjectData.csproj.CopyComplete
+F:\CVProject\CVProjectData\obj\Debug\netcoreapp3.1\CVProjectData.dll
+F:\CVProject\CVProjectData\obj\Debug\netcoreapp3.1\CVProjectData.pdb
