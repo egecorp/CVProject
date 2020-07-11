@@ -1,6 +1,6 @@
-**/bin/
-**/bin/Debug/
-**/bin/Release/
-**/obj/
-**/logs/
-**/\.vs/
+**/bin/**
+**/bin/Debug/**
+**/bin/Release/**
+**/obj/**
+**/logs/**
+**/\.vs/**
